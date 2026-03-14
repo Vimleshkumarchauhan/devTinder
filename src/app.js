@@ -23,20 +23,39 @@ const app = express();
 // });
 
 
-//------------------------------- app.use routes ----------------------------
+//------------------------------- various app routes handlers ----------------------------
 
 
-app.get("/",(req,res)=>{
-    res.send("Api using get !");
-});
+// app.get(/a/,(req,res)=>{
+//     res.send({"first name":"Vimlesh ","last Name":"Kumar"});
+// });
 
-app.post("/test",(req,res)=>{
-    res.send("api using the post request");
-});
+// app.post("/test",(req,res)=>{
+//     res.send("api using the post request");
+// });
 
-app.put("/hello",(req,res)=>{
-    res.send("Working on the put request");
-});
+// app.put("/hello",(req,res)=>{
+//     res.send("Working on the put request");
+// });
+
+
+
+// ------------------------ Handling routes (Nested with the help of the next())-------
+
+app.get("/route",(req,res,next)=>{
+    console.log("In the route 1");
+    //res.send("Response 1");
+    next();
+},(req,res,next)=>{
+        console.log("In the route 2");
+        //res.send("Response 2");
+        next();
+    },
+    (req,res)=>{
+        console.log("In the route 3");
+        res.send("Response 3")
+    }
+);
 
 app.listen(3000,()=>{
     console.log("Server is started");
