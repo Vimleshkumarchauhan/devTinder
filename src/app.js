@@ -1,5 +1,7 @@
 const express = require("express")
 
+const {adminAuth,userAuth} = require("./middleware/auth");
+
 const app = express();
 
 
@@ -42,20 +44,43 @@ const app = express();
 
 // ------------------------ Handling routes (Nested with the help of the next())-------
 
-app.get("/route",(req,res,next)=>{
-    console.log("In the route 1");
-    //res.send("Response 1");
-    next();
-},(req,res,next)=>{
-        console.log("In the route 2");
-        //res.send("Response 2");
-        next();
-    },
-    (req,res)=>{
-        console.log("In the route 3");
-        res.send("Response 3")
-    }
-);
+// app.get("/route",(req,res,next)=>{
+//     console.log("In the route 1");
+//     //res.send("Response 1");
+//     next();
+// },(req,res,next)=>{
+//         console.log("In the route 2");
+//         //res.send("Response 2");
+//         next();
+//     },
+//     (req,res)=>{
+//         console.log("In the route 3");
+//         res.send("Response 3")
+//     }
+// );
+
+//---------------------------------------------------------------------------------------------------
+
+app.use("/admin",adminAuth);
+
+app.post("/user/login",(req,res)=>{
+    res.send("User Login successfully");
+})
+
+app.get("/user/getData",userAuth,(req,res)=>{
+        res.send("user Data get successfully");
+});
+
+
+app.get("/admin/getData",(req,res)=>{
+        res.send("Data get successfully");
+});
+
+
+
+app.delete("/admin/deleteData",(req,res)=>{
+    res.send("Data deleted successfully");
+});
 
 app.listen(3000,()=>{
     console.log("Server is started");
