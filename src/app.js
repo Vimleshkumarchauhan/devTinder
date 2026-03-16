@@ -77,10 +77,29 @@ app.get("/admin/getData",(req,res)=>{
 });
 
 
+app.get("/getUserData",(req,res)=>{
+    try{
+        throw new Error("Error name");
+        res.send("User data is send");
+    }catch(err){
+        res.status(500).send("something went wrong there");
+    }
+    
+});
+
+app.use("/",(err,req,res,next)=>{
+    //Log your errors.
+    if (err){
+        res.status(500).send("Something went wrong");
+    }
+});
+
 
 app.delete("/admin/deleteData",(req,res)=>{
     res.send("Data deleted successfully");
 });
+
+
 
 app.listen(3000,()=>{
     console.log("Server is started");
