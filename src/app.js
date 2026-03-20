@@ -1,106 +1,39 @@
+const dns = require('node:dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 const express = require("express")
 
-const {adminAuth,userAuth} = require("./middleware/auth");
+const connectDB = require("./config/database")
 
 const app = express();
 
+const User = require("./models/user");
 
-//-------------------------------- app.use routes ---------------------------
-// app.get("/",(req,res)=>{
-//     res.send("Inside the get request");
-// })
+app.post("/signup",async (req,res)=>{
+    const user = new User({
+        firstName:"virat",
+        lastName:"kohli",
+        emailId:"virat@kohli.com",
+        password:"virat@123",
+    });
 
+    try{
+        await user.save();
+        res.send("User added successfully");
+    }catch(err){
+        res.status(400).send("Error saving the user "+err.message);
+    }
 
-
-// app.use("/test",(req,res)=>{
-//     res.send("Inside the test page");
-// });
-
-// app.use("/test/hello",(req,res)=>{
-//     res.send("ji namste kaise ho");
-// });
-
-// app.use("/",(req,res)=>{
-//     res.send("Hello from Vimlesh");
-// });
-
-
-//------------------------------- various app routes handlers ----------------------------
-
-
-// app.get(/a/,(req,res)=>{
-//     res.send({"first name":"Vimlesh ","last Name":"Kumar"});
-// });
-
-// app.post("/test",(req,res)=>{
-//     res.send("api using the post request");
-// });
-
-// app.put("/hello",(req,res)=>{
-//     res.send("Working on the put request");
-// });
-
-
-
-// ------------------------ Handling routes (Nested with the help of the next())-------
-
-// app.get("/route",(req,res,next)=>{
-//     console.log("In the route 1");
-//     //res.send("Response 1");
-//     next();
-// },(req,res,next)=>{
-//         console.log("In the route 2");
-//         //res.send("Response 2");
-//         next();
-//     },
-//     (req,res)=>{
-//         console.log("In the route 3");
-//         res.send("Response 3")
-//     }
-// );
-
-//---------------------------------------------------------------------------------------------------
-
-app.use("/admin",adminAuth);
-
-app.post("/user/login",(req,res)=>{
-    res.send("User Login successfully");
+    
 })
 
-app.get("/user/getData",userAuth,(req,res)=>{
-        res.send("user Data get successfully");
-});
 
-
-app.get("/admin/getData",(req,res)=>{
-        res.send("Data get successfully");
-});
-
-
-app.get("/getUserData",(req,res)=>{
-    try{
-        throw new Error("Error name");
-        res.send("User data is send");
-    }catch(err){
-        res.status(500).send("something went wrong there");
-    }
-    
-});
-
-app.use("/",(err,req,res,next)=>{
-    //Log your errors.
-    if (err){
-        res.status(500).send("Something went wrong");
-    }
-});
-
-
-app.delete("/admin/deleteData",(req,res)=>{
-    res.send("Data deleted successfully");
-});
-
-
-
-app.listen(3000,()=>{
+connectDB().then(()=>{
+    console.log("Database connected successfully");
+    app.listen(3000,()=>{
     console.log("Server is started");
 });
+}).catch(err=>{
+    console.error("Database cannot be connected",err.message);
+});
+
