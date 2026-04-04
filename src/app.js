@@ -8,6 +8,7 @@ const connectDB = require("./config/database")
 const app = express();
 
 const User = require("./models/user");
+const { get } = require('node:http');
 
 app.use(express.json());
 
@@ -55,6 +56,53 @@ app.get("/feed",async (req,res)=>{
     }
 })
 
+// finding the user with /userById GET api call
+
+app.get("/userById",async (req,res)=>{
+
+    const userId = req.body._id;
+    
+    try{
+        const user = await User.findById(userId);
+        res.send(user);
+    }catch{
+        res.status(400).send("Some error occured");
+    }
+});
+
+
+// Delete API to delete the user
+
+app.delete("/user",async (req,res)=>{
+
+    const userId = req.body._id;
+
+    try{
+        const user = await User.findByIdAndDelete(userId);
+        res.send("User deleted successfully");
+    }catch{
+        res.status(400).find("Something went wrong");
+    }
+});
+
+//--- Find by ID and delete
+
+// Find and update data ---------------------------
+app.patch("/user",async (req,res)=>{
+    const userId = req.body.userId;
+    const data = req.body;
+    try{
+        const user = await User.findByIdAndUpdate({_id:userId},data,{
+            returnDocument:"before",
+            runValidators:true,
+        });
+        res.send("User updated successfully");
+    }catch(err){
+        res.status(400).send("UPDATE failed !"+err);
+    }
+});
+
+// --^^^^^^^^^------------------Updating the data -------------------------------------^^^^^
 
 connectDB().then(()=>{
     console.log("Database connected successfully");
