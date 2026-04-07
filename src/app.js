@@ -2,22 +2,38 @@ const dns = require('node:dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const express = require("express")
-
 const connectDB = require("./config/database")
+const {validateSignUpData} = require("./utils/validaton");
+const bcrypt = require("bcrypt");
+
 
 const app = express();
-
 const User = require("./models/user");
 const { get } = require('node:http');
 
 app.use(express.json());
 
+
+//---------------vvvv---------Signup--------------------
+
 app.post("/signup",async (req,res)=>{
-
-
-    const user = new User(req.body);
-
     try{
+        //validation of data
+        validateSignUpData(req);
+
+        const {firstName,lastName,emailId,password} = req.body;
+        //encrypting the password
+        const passwordHash = await bcrypt.hash(password,10);
+
+        //creating the new user instance
+        const user = new User({
+            firstName,
+            lastName,
+            emailId,
+            password:passwordHash,
+        });
+
+
         await user.save();
         res.send("User added successfully");
     }catch(err){
@@ -26,6 +42,32 @@ app.post("/signup",async (req,res)=>{
 
     
 });
+
+
+// Login API
+
+app.post("/login",async (req,res)=>{
+    try{
+        const {emailId,password} = req.body;
+        const user = await User.findOne({emailId:emailId});
+
+        console.log("password = "+password);
+        console.log("user password = "+user.password);
+        
+
+        const isPasswordValid = await bcrypt.compare(password,user.password);
+        
+        if (isPasswordValid){
+            res.send("Login successful !");
+        }else{
+            throw new Error("Invalid credentials");
+        }
+    }catch(err){
+            res.status(400).send("Error "+err.message);
+        }
+});
+
+//--------------vvvvvvvvvvv Find user --------------
 
 app.get("/user",async (req,res)=>{
 
